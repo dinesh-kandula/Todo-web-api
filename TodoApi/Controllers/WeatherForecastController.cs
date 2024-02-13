@@ -18,7 +18,7 @@ namespace TodoApi.Controllers
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
+        [HttpGet("/GetWeatherForecast/get")]
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(0, 4).Select(index => new WeatherForecast
@@ -28,6 +28,12 @@ namespace TodoApi.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+
+        [HttpGet("/weather/{id}")]
+        public ActionResult<string> Get(int id)
+        {
+            return "Not Found " + id;
         }
 
     }

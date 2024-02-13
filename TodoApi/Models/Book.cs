@@ -24,6 +24,6 @@ namespace TodoApi.Models
         public IFormFile? CoverImageFile { get; set; }
 
         // Many to Many 
-        public ICollection<FavBook> FavBooks { get; set; }
+        public ICollection<FavBook>? FavBooks { get; set; }
     }
 }

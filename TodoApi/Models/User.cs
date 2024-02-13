@@ -18,9 +18,9 @@ namespace TodoApi.Models
         public required string Name { get; set; }
 
         [DataType(DataType.Date), DisplayName("Date Of Birth")]
-        public DateTime DOB { get; set; }
+        public DateOnly? DOB { get; set; }
 
-        public Gender Gender { get; set; }
+        public Gender? Gender { get; set; }
 
         [DisplayName("Profile Picture")]
         public string? Profile { get; set; }
@@ -30,12 +30,12 @@ namespace TodoApi.Models
 
         // One to One Realationship b/w User and credentials each user have only one credentials details
         // and each credentails details are belong to one user only
-        public Credential Credential { get; set; }
+        public Credential? Credential { get; set; }
 
         // One to Many ==> One user Many Todo
-        public ICollection<Todo> Todo { get; set; }
+        public ICollection<Todo>? Todo { get; set; }
 
         // Many to Many ==> Many Users Many FavBook
-        public ICollection<FavBook> FavBook { get; set; }
+        public ICollection<FavBook>? FavBook { get; set; }
     }
 }

@@ -40,6 +40,6 @@ namespace TodoApi.Models
         public required Guid UserId { get; set; }
 
         // Each Todo Belong to one user only ==> Many to One
-        public User User { get; set; }
+        public User? User { get; set; }
     }
 }

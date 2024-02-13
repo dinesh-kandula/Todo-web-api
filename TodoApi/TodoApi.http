@@ -4,3 +4,19 @@ GET {{TodoApi_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+
+POST {{TodoApi_HostAddress}}/Todoes
+Accept: application/json
+
+{
+  "TodoId" : "bde5f0ad-8e4f-4b84-bc41-4ac77fb5221b",
+  "Title" : "Leave and WFH Request",
+  "Description" : "Ask for Leave and WFH Request",
+  "Status" : 2,
+  "Priority" : 2,
+  "CreatedDate" : "2024-02-12T12:16:41.359Z",
+  "UpdatedDate" : "2024-02-12T12:16:41.359Z",
+  "UserId" : "EF269CFF-6D57-4E9C-9FE7-D82B2CE90393",
+  "User" : null
+}

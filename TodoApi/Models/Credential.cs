@@ -21,6 +21,6 @@ namespace TodoApi.Models
         [Required]
         public required Guid UserId { get; set; }
 
-        public User User { get; set; }
+        public User? User { get; set; }
     }
 }
