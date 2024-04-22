@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TodoApi.Models;
+using TodoModels.DBContext;
 
 #nullable disable
 
@@ -17,12 +17,12 @@ namespace TodoApi.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.1")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("TodoApi.Models.Book", b =>
+            modelBuilder.Entity("TodoModels.Models.Book", b =>
                 {
                     b.Property<Guid>("BookId")
                         .ValueGeneratedOnAdd()
@@ -47,7 +47,7 @@ namespace TodoApi.Migrations
                     b.ToTable("Books");
                 });
 
-            modelBuilder.Entity("TodoApi.Models.Credential", b =>
+            modelBuilder.Entity("TodoModels.Models.Credential", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -63,7 +63,7 @@ namespace TodoApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Username")
@@ -74,7 +74,8 @@ namespace TodoApi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("UserId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.HasIndex("Username", "EmailId")
                         .IsUnique();
@@ -82,7 +83,7 @@ namespace TodoApi.Migrations
                     b.ToTable("Credentials");
                 });
 
-            modelBuilder.Entity("TodoApi.Models.FavBook", b =>
+            modelBuilder.Entity("TodoModels.Models.FavBook", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -105,7 +106,91 @@ namespace TodoApi.Migrations
                     b.ToTable("FavBooks");
                 });
 
-            modelBuilder.Entity("TodoApi.Models.Todo", b =>
+            modelBuilder.Entity("TodoModels.Models.PizzaSpecial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BasePrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PizzaSpecials");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BasePrice = 9.99m,
+                            Description = "It's cheesy and delicious. Why wouldn't you want one?",
+                            ImageUrl = "img/pizzas/cheese.jpg",
+                            Name = "Basic Cheese Pizza"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BasePrice = 11.99m,
+                            Description = "It has EVERY kind of bacon",
+                            ImageUrl = "img/pizzas/bacon.jpg",
+                            Name = "The Baconatorizor"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            BasePrice = 10.50m,
+                            Description = "It's the pizza you grew up with, but Blazing hot!",
+                            ImageUrl = "img/pizzas/pepperoni.jpg",
+                            Name = "Classic pepperoni"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            BasePrice = 12.75m,
+                            Description = "Spicy chicken, hot sauce and bleu cheese, guaranteed to warm you up",
+                            ImageUrl = "img/pizzas/meaty.jpg",
+                            Name = "Buffalo chicken"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            BasePrice = 11.00m,
+                            Description = "It has mushrooms. Isn't that obvious?",
+                            ImageUrl = "img/pizzas/mushroom.jpg",
+                            Name = "Mushroom Lovers"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            BasePrice = 11.50m,
+                            Description = "It's like salad, but on a pizza",
+                            ImageUrl = "img/pizzas/salad.jpg",
+                            Name = "Veggie Delight"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            BasePrice = 9.99m,
+                            Description = "Traditional Italian pizza with tomatoes and basil",
+                            ImageUrl = "img/pizzas/margherita.jpg",
+                            Name = "Margherita"
+                        });
+                });
+
+            modelBuilder.Entity("TodoModels.Models.Todo", b =>
                 {
                     b.Property<Guid>("TodoId")
                         .ValueGeneratedOnAdd()
@@ -143,7 +228,7 @@ namespace TodoApi.Migrations
                     b.ToTable("Todos");
                 });
 
-            modelBuilder.Entity("TodoApi.Models.User", b =>
+            modelBuilder.Entity("TodoModels.Models.User", b =>
                 {
                     b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
@@ -168,26 +253,24 @@ namespace TodoApi.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("TodoApi.Models.Credential", b =>
+            modelBuilder.Entity("TodoModels.Models.Credential", b =>
                 {
-                    b.HasOne("TodoApi.Models.User", "User")
+                    b.HasOne("TodoModels.Models.User", "User")
                         .WithOne("Credential")
-                        .HasForeignKey("TodoApi.Models.Credential", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TodoModels.Models.Credential", "UserId");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TodoApi.Models.FavBook", b =>
+            modelBuilder.Entity("TodoModels.Models.FavBook", b =>
                 {
-                    b.HasOne("TodoApi.Models.Book", "Book")
+                    b.HasOne("TodoModels.Models.Book", "Book")
                         .WithMany("FavBooks")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TodoApi.Models.User", "User")
+                    b.HasOne("TodoModels.Models.User", "User")
                         .WithMany("FavBook")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -198,9 +281,9 @@ namespace TodoApi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TodoApi.Models.Todo", b =>
+            modelBuilder.Entity("TodoModels.Models.Todo", b =>
                 {
-                    b.HasOne("TodoApi.Models.User", "User")
+                    b.HasOne("TodoModels.Models.User", "User")
                         .WithMany("Todo")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -209,12 +292,12 @@ namespace TodoApi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TodoApi.Models.Book", b =>
+            modelBuilder.Entity("TodoModels.Models.Book", b =>
                 {
                     b.Navigation("FavBooks");
                 });
 
-            modelBuilder.Entity("TodoApi.Models.User", b =>
+            modelBuilder.Entity("TodoModels.Models.User", b =>
                 {
                     b.Navigation("Credential");
 

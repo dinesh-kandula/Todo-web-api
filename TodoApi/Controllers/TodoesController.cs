@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TodoApi.Models;
+using TodoModels.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using TodoModels.Services;
 
 namespace TodoApi.Controllers
 {
@@ -14,103 +15,113 @@ namespace TodoApi.Controllers
     [ApiController]
     public class TodoesController : ControllerBase
     {
-        private readonly TodoDbContext _context;
+        private readonly IUnitofWork _unitofWork;
 
-        public TodoesController(TodoDbContext context)
+        public TodoesController(IUnitofWork unitofWork)
         {
-            _context = context;
+            _unitofWork = unitofWork;
         }
 
         // GET: /Todoes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Todo>>> GetTodos()
+        public async Task<List<Todo>> GetTodos()
         {
-            return await _context.Todos.ToListAsync();
+           return await _unitofWork.TodoRepository.GetAllAsync();
         }
 
         // GET: /Todoes/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Todo>> GetTodo(Guid id)
         {
-            var todo = await _context.Todos.FindAsync(id);
+            Todo _data = await _unitofWork.TodoRepository.GetAsync(id);
 
-            var todo1 = from x in _context.Todos where x.TodoId == id select x;
-
-            if (todo == null)
-            {
+            if (_data == null)
                 return NotFound();
+
+            var todo = new {_data.TodoId, _data.Title, _data.Description, _data.Priority, _data.Status, _data.CreatedDate, _data.UpdatedDate, _data.UserId};
+
+            return Ok(todo);
+        }
+
+        // GET: api/Users/Todoes/5
+        [HttpGet("/Users/Todoes/{userId}")]
+        public async Task<ActionResult<Todo>> GetUsersTodo(Guid userId)
+        {
+            List<Todo>_data = await _unitofWork.TodoRepository.GetUsersTodoAsync(userId);
+
+            if (_data.Count == 0)
+                return NotFound();
+
+            List<object> todoList = [];
+
+            foreach (var item in _data)
+            {
+                var todoItem = new {item.TodoId, item.Title, item.Description, item.Priority, item.Status, item.CreatedDate, item.UpdatedDate };
+                todoList.Add(todoItem);
             }
 
-            return todo;
+            return Ok(todoList);
         }
 
         // PUT: /Todoes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTodo(Guid id, Todo todo)
+        public async Task<IActionResult> PutTodo(Guid id, [FromBody] Todo todo)
         {
-            if (id != todo.TodoId)
-            {
-                return BadRequest();
-            }
+            var _data = await _unitofWork.TodoRepository.UpdateEntity(id, todo);
 
-            _context.Entry(todo).State = EntityState.Modified;
-
-            try
+            if (_data)
             {
-                await _context.SaveChangesAsync();
+                await _unitofWork.CompleteAsync();
+                return Ok(201);
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TodoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            else
+                return BadRequest(204);
         }
 
         // POST: /Todoes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Todo>> PostTodo(Todo todo)
+        public async Task<ActionResult<Todo>> PostTodo([FromBody] Todo todo)
         {
+            User user = await _unitofWork.UserRepository.GetAsync(todo.UserId);
+            if (user == null) return StatusCode(404, "No User Found with user Id");
+
+            todo.User = user;
             todo.Status = (Status) Enum.ToObject(typeof(Status), todo.Status);
             todo.Priority = (Priority) Enum.ToObject(typeof(Priority), todo.Priority);
+            todo.TodoId = new Guid();
 
-            todo.User = await _context.Users.FirstOrDefaultAsync(e => e.UserId == todo.UserId);
+            todo.CreatedDate = DateTime.Now;
+            todo.UpdatedDate = DateTime.Now;
 
-
-            _context.Todos.Add(todo);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetTodo), new { id = todo.TodoId }, todo);
+            var _data = _unitofWork.TodoRepository.AddEntity(todo);
+            if (_data.IsCompleted)
+            {
+                await _unitofWork.CompleteAsync();
+                return Ok(todo.TodoId);
+            }
+            
+            return BadRequest(400);
         }
 
         // DELETE: /Todoes/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTodo(Guid id)
         {
-            var todo = await _context.Todos.FindAsync(id);
+            var todo = await _unitofWork.TodoRepository.GetAsync(id);
             if (todo == null)
             {
                 return NotFound();
             }
 
-            _context.Todos.Remove(todo);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool TodoExists(Guid id)
-        {
-            return _context.Todos.Any(e => e.TodoId == id);
+            var _data = _unitofWork.TodoRepository.DeleteEntity(todo);
+            if (_data.IsCompleted)
+            {
+                await _unitofWork.CompleteAsync();
+                return StatusCode(200, "Successly Deleted");
+            }
+            return StatusCode(502, "DB Error");
         }
     }
 }

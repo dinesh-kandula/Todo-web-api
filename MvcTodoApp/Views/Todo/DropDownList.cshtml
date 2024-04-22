@@ -1,0 +1,8 @@
+﻿@using System
+@model Enum
+
+@(Html.Kendo().DropDownList()
+    .Name("ddl" + ViewData.TemplateInfo.GetFullHtmlFieldName(""))
+    .BindTo(Enum.GetValues(Model.GetType()).Cast<Enum>().Select(e => new { value = e, text = e.ToString() }))
+    .OptionLabel("-- Select --")
+)

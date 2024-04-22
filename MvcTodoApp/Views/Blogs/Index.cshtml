@@ -1,0 +1,148 @@
+﻿@model MvcTodoApp.Controllers.MyViewModel
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Title
+                </th>
+                <th>
+                    Content
+                </th>
+                <th>
+                    Created/Update Date
+                </th>
+                <th>
+                    Cover Photo
+                </th>
+                <th>
+                    Author
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.BlogList)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Content)
+                    </td>
+                    <td>
+                        @if (item.CreatedAt == item.UpdatedAt)
+                        {
+                            @Html.DisplayFor(modelItem => item.CreatedAt)
+                        }
+                        else
+                        {
+                            @Html.DisplayFor(modelItem => item.UpdatedAt)
+                        }
+                    </td>
+                    <td>
+                        <img src="Uploads/@item.Cover" style="width:100px;" />
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Author)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <br />
+
+    <div class="row">
+        <div class="col-12">
+            @(Html.Kendo().Grid(Model.DinnuList)
+                .Name("grid")
+                .Columns(columns =>
+                {
+                    columns.Bound(p => p.UserId).Filterable(false).Width(100);
+                    columns.Bound(p => p.Id).Width(100);
+                    columns.Bound(p => p.Title);
+                    columns.Bound(p => p.Body);
+                })
+                .Pageable(pageable => pageable
+                .ButtonCount(5))
+                .Sortable()
+                .Scrollable()
+                .Groupable()
+                .Filterable()
+                .HtmlAttributes(new { style = "height:550px;" })
+                @* .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(10)
+                .Read(read => read.Action("Orders_Read", "Blogs"))
+                ) *@
+                )
+        </div>
+    </div>
+
+    <br/>
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    UserId
+                </th>
+                <th>
+                    Id
+                </th>
+                <th>
+                    Title
+                </th>
+                <th>
+                    Body
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.DinnuList)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Body)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</body>
+</html>

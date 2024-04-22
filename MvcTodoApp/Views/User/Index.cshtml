@@ -1,0 +1,65 @@
+﻿@* Todo Index Page *@
+@model IEnumerable<TodoModels.Models.User>
+@{
+    ViewData["Title"] = "Index";
+
+}
+
+<body>
+    <div class="container">
+        <div>
+            @if (TempData["error"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["error"]
+                </div>
+            }
+        </div>
+
+        <div class="row">
+            <p>
+                <a asp-action="Create">Create New</a>
+            </p>
+            <div>
+                <h1>Todo Index Page</h1>
+            </div>
+            <div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th> @Html.DisplayNameFor(model => model.UserId) </th>
+                            <th> @Html.DisplayNameFor(model => model.Name) </th>
+                            <th> @Html.DisplayNameFor(model => model.DOB) </th>
+                            <th> @Html.DisplayNameFor(model => model.Gender) </th>
+                            <th> @Html.DisplayNameFor(model => model.Profile) </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td> @Html.DisplayFor(modelItem => item.UserId) </td>
+                                <td> @Html.DisplayFor(modelItem => item.Name) </td>
+                                <td> @Html.DisplayFor(modelItem => item.DOB) </td>
+
+
+
+                                <td style="color: @(item.Gender == TodoModels.Models.Gender.MALE ? "red" : item.Gender == TodoModels.Models.Gender.FEMALE ? "yellow" : "green");">
+                                    @Html.DisplayFor(modelItem => item.Gender)
+                                </td>
+
+                                <td> @Html.DisplayFor(modelItem => item.Profile) </td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-Id="@item.UserId">Edit</a> |
+                                    <a asp-action="Details" asp-route-Id="@item.UserId">Details</a> |
+                                    <a asp-action="Delete" class="text-danger" asp-route-Id="@item.UserId">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+</body>

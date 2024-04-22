@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+}
+
+<h2>Welcome</h2>
+
+<ul>
+    @for (int i = 0; i < (int)ViewData["NumTimes"]!; i++)
+    {
+        <li>@ViewData["Message"]</li>
+    }
+
+    <ol>
+        @foreach (string item in (List<string>)ViewData["NameList"]!)
+        {
+            <li>@item</li>
+            <ol>
+                @foreach (string item1 in (List<string>)ViewData["NameList"]!)
+                {
+                    <li>@item1</li>
+                }
+            </ol>
+        }
+        
+    </ol>
+
+</ul>

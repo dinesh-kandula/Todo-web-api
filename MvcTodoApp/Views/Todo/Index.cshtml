@@ -1,0 +1,169 @@
+﻿@* Todo Index Page *@
+@model IEnumerable<TodoModels.Models.Todo>
+@using Kendo.Mvc.UI
+@{
+    ViewData["Title"] = "Index";
+}
+<html>
+<body>
+    <div class="container">
+        <div class="row">
+            <p>
+                <a asp-action="Create">Create New</a>
+            </p>
+
+            <div>
+                <h1 class="main-todo-heading">Todo Index Page</h1>
+            </div>
+
+            @* <div>
+            <table class="table">
+            <thead>
+            <tr>
+            <th> @Html.DisplayNameFor(model => model.TodoId) </th>
+            <th> @Html.DisplayNameFor(model => model.Title) </th>
+            <th> @Html.DisplayNameFor(model => model.Description) </th>
+            <th> @Html.DisplayNameFor(model => model.Status) </th>
+            <th> @Html.DisplayNameFor(model => model.Priority) </th>
+            <th> @Html.DisplayNameFor(model => model.CreatedDate) </th>
+            <th> @Html.DisplayNameFor(model => model.UpdatedDate) </th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+            <tr>
+            <td> @Html.DisplayFor(modelItem => item.TodoId) </td>
+            <td> @Html.DisplayFor(modelItem => item.Title) </td>
+            <td> @Html.DisplayFor(modelItem => item.Description) </td>
+
+            <td style="color: @(item.Status == TodoModels.Models.Status.TODO ? "red" : item.Status == TodoModels.Models.Status.WORKING ? "yellow" : "green");">
+            @Html.DisplayFor(modelItem => item.Status)
+            </td>
+
+            <td> @Html.DisplayFor(modelItem => item.Priority) </td>
+            <td> @Html.DisplayFor(modelItem => item.CreatedDate) </td>
+            <td> @Html.DisplayFor(modelItem => item.UpdatedDate) </td>
+            <td>
+            <a asp-action="Edit" asp-route-Id="@item.TodoId">Edit</a> |
+            <a asp-action="Details" asp-route-Id="@item.TodoId">Details</a> |
+            <a asp-action="Delete" class="text-danger" asp-route-Id="@item.TodoId">Delete</a>
+            </td>
+            </tr>
+            }
+            </tbody>
+            </table>
+            </div> *@
+        </div>
+
+        <div>
+          @*   @(
+                Html.Kendo().AutoComplete()
+                .Name("searchString")
+                .BindTo(ViewBag.TodoTitle)
+                .HighlightFirst()
+                .HtmlAttributes(new { style = "width:150px;" })
+                ) *@
+
+           @*  $(function() {
+            // Add event handler to capture user input in the autocomplete control
+            $("#searchString").kendoAutoComplete({
+            minLength: 3, // Minimum characters before triggering the search
+            filter: "contains", // Filter mode
+            dataSource: {
+            serverFiltering: true, // Enable server-side filtering
+            transport: {
+            read: {
+            url: "@Url.Action("FilterGrid", "Todo")", // URL to the controller action
+            dataType: "json", // Data type of the response
+            type: "POST" // HTTP request method
+            },
+            parameterMap: function(options) {
+            // Map the search string to the parameter expected by the server
+            return { searchString: options.filter.filters[0].value };
+            }
+            }
+            }
+            }); 
+            }); *@
+
+        </div>
+        <div class="row">
+            <div class="col-12">
+                @(
+                    Html.Kendo().Grid<TodoModels.Models.Todo>()
+                    .Name("grid")
+                    .Columns(columns =>
+                    {
+                        @*  columns.Bound(p => p.TodoId).Filterable(false); *@
+                        columns.Bound(p => p.Title);
+                        columns.Bound(p => p.Description);
+                        columns.Bound(p => p.Status).Filterable(filterable => filterable.UI("statusFilter"));
+                        columns.Bound(p => p.Priority).EditorTemplateName("DropDownList").Filterable(ftb => ftb.Multi(true).Search(true));
+                        columns.Bound(p => p.CreatedDate).Format("{0:dd/MM/yyyy}").Filterable(ftb => ftb.Multi(true));
+                        columns.Bound(p => p.UpdatedDate).Format("{0:dd/MM/yyyy}").Filterable(ftb => ftb.Multi(true));
+                        columns.Bound(p => p.UserId).Filterable(ftb => ftb.Multi(true));
+                        columns.Command(c => { c.Destroy(); }).Width(110);
+
+                    })
+                    .ToolBar(toolBar =>
+                    {
+                        toolBar.Create();
+                        toolBar.Save();
+                    })
+                    .Editable(editable => editable.Mode(GridEditMode.InCell))
+                    .Pageable()
+                    .Filterable()
+                    .Sortable()
+                    .Navigatable()
+                    .Scrollable()
+                    .Groupable()
+                    .HtmlAttributes(new { style = "height:650px;" })
+                    .DataSource(
+                    dataSource => dataSource
+                    .Ajax()
+                    .Batch(true)
+                    .PageSize(5)
+                    .ServerOperation(false)
+                    .Events(events => events.Error("error_handler"))
+                    .Model(model => model.Id(p => p.TodoId))
+                    .Create("Filter_Multi_Editing_Create", "Todo")
+                    .Read(read => read.Action("Orders_Read", "Todo"))
+                    .Update("Filter_Multi_Editing_Update", "Todo")
+                    .Destroy("Filter_Multi_Editing_Destroy", "Todo")
+                    )
+                    )
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function error_handler(e) {
+            if (e.errors) {
+                var message = "Errors:\n";
+                $.each(e.errors, function (key, value) {
+                    if ('errors' in value) {
+                        $.each(value.errors, function () {
+                            message += this + "\n";
+                        });
+                    }
+                });
+                alert(message);
+            }
+        }
+
+        function statusFilter(element) {
+            element.kendoDropDownList({
+                dataSource: {
+                    transport: {
+                        read: "@Url.Action("FilterMenuCustomization_Status")"
+                    }
+                },
+                optionLabel: "--Select Value--"
+            });
+        }
+
+    </script>
+
+</body>
+</html>

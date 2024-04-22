@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using TodoApi.Models;
-using TodoApi.Repositories;
+using TodoModels.Repositories;
+using TodoModels.Services;
+using TodoModels.DBContext;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +13,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<TodoDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DBConnection")
-            ?? throw new InvalidOperationException("Connection string 'TodoDbContext' not found.")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DBConnection") 
+            ?? 
+            throw new InvalidOperationException("Connection string 'TodoDbContext' not found."),
+        b => b.MigrationsAssembly("TodoApi")));
 
 builder.Services.AddScoped<IUnitofWork, UnitofWorkRepository>();
 

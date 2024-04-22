@@ -10,13 +10,31 @@ POST {{TodoApi_HostAddress}}/Todoes
 Accept: application/json
 
 {
-  "TodoId" : "bde5f0ad-8e4f-4b84-bc41-4ac77fb5221b",
   "Title" : "Leave and WFH Request",
   "Description" : "Ask for Leave and WFH Request",
   "Status" : 2,
   "Priority" : 2,
-  "CreatedDate" : "2024-02-12T12:16:41.359Z",
-  "UpdatedDate" : "2024-02-12T12:16:41.359Z",
-  "UserId" : "EF269CFF-6D57-4E9C-9FE7-D82B2CE90393",
-  "User" : null
+  "UserId" : "EF269CFF-6D57-4E9C-9FE7-D82B2CE90393"
+}
+
+###
+GET {{TodoApi_HostAddress}}/api/Users
+
+###
+
+# Add User
+POST {{TodoApi_HostAddress}}/api/Users
+Accept: application/json
+
+{
+  "UserId" : "27171592-1a73-4c9c-93aa-23e0660cb511",
+  "Name" : "Loki",
+  "DOB" : "1980-01-19",
+  "Gender": 0,
+  "Profile" : NULL,
+  "Credential" : {
+    "Username": "loki_tva",
+    "EmailId": "loki123@gmail.com",
+    "Password": "loki123"
+  }
 }
